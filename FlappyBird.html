@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="cv">    </canvas>
+    <script src="js/fly.js"></script>
+
+    <script>
+        var cv = document.getElementById('cv');
+        cv.width = 800;
+        cv.height = 600;
+        cv.style.border = '1px solid red';
+        var context = cv.getContext('2d');
+
+
+        // 将所有的图片名字存到一个数组中
+        var imgsArr = ['birds', 'land', 'sky', 'pipe1', 'pipe2']
+
+        Fly.loadImages(imgsArr, function(imgsList) {
+            var img = imgsList.birds; //小鸟的图片对象
+            var imgW = img.width / 3;
+            var imgH = img.height;
+            var frameIndex = 0;
+            var y = 100;
+            var a = 0.0005;
+            var speed = 0; //初始速度
+            var lastFrameTime = new Date();
+            var currentTime;
+            var delta = 0; //两帧之间的时间间隔
+
+            (function render() {
+                context.clearRect(0, 0, cv.width, cv.height);
+
+
+                currentTime = new Date();
+                delta = currentTime - lastFrameTime;
+                lastFrameTime = currentTime;
+
+                // 小鸟下落过程是一个匀加速过程，有加速度，瞬时速度，位移
+                // 小鸟下落的位移为s,下落时间为t,加速度为a
+                // s = v * t + 1/2 * a * t^2;
+                // v = v0 + a * t;  v0是初始速度
+                speed += a * delta;
+                y += speed * delta + 1 / 2 * a * Math.pow(delta, 2)
+
+                context.drawImage(img, imgW * frameIndex++, 0, imgW, imgH, 100, y, imgW, imgH);
+                // if (frameIndex >= 3) {
+                //     frameIndex = 0;
+                // }
+                frameIndex %= 3;
+                requestAnimationFrame(render)
+            })()
+
+            cv.addEventListener('click', function() {
+                speed = -0.2;
+            })
+        })
+    </script>
+
+</body>
+
+</html>
